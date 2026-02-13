@@ -83,11 +83,12 @@ class EnvSync extends Module implements BootstrapInterface
         fwrite(fopen($path, 'w'), $this->syncFilesystem->read($backupPath));
 
         $arguments = [
-            'mysql',
+            '/usr/bin/mariadb',
             '--host=' . $this->dsnAttribute('host', $db->dsn),
             '--port=' . ($this->dsnAttribute('port', $db->dsn) ?? 3306),
             '--user=' . $db->username,
             '--password=' . $db->password,
+            '--skip-ssl',
             $this->dsnAttribute('dbname', $db->dsn),
             '<',
             $path
@@ -99,7 +100,7 @@ class EnvSync extends Module implements BootstrapInterface
         FileHelper::unlink($path);
 
         if (!$process->isSuccessful()) {
-            throw new \Exception('Import failed with output: ' . $process->getOutput());
+            throw new \Exception('Import failed with output: ' . $process->getErrorOutput());
         }
     }
 
