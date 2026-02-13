@@ -11,7 +11,7 @@ use JCIT\envSync\commands\ImportController;
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
-use Spatie\DbDumper\Databases\MySql;
+use Spatie\DbDumper\Databases\MariaDb;
 use Symfony\Component\Process\Process;
 use yii\base\BootstrapInterface;
 use yii\base\Exception;
@@ -53,11 +53,12 @@ class EnvSync extends Module implements BootstrapInterface
             FileHelper::createDirectory(dirname($path));
         }
 
-        MySql::create()
+        MariaDb::create()
             ->setDbName($this->dsnAttribute('dbname', $db->dsn))
             ->setUserName($db->username)
             ->setPassword($db->password)
             ->setHost($this->dsnAttribute('host', $db->dsn))
+            ->setSkipSsl()
             ->dumpToFile($path);
 
         $targetPath = $this->getSyncStorageBasePath() . 'backup/' . basename($path);
